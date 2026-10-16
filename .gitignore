@@ -1,0 +1,7 @@
+.*
+!.gitignore
+*_credentials
+*.sqlite
+__pycache__/
+.venv/
+venv/

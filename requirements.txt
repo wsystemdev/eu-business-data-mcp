@@ -1,0 +1,7 @@
+fastapi==0.143.1
+uvicorn==0.54.0
+httpx==0.28.1
+mcp[cli]==1.30.0
+x402[evm,fastapi]==2.25.0
+rapidfuzz>=3.9
+Unidecode>=1.3
