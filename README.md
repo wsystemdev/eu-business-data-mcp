@@ -29,9 +29,9 @@ Example client config:
 | `verify_eori_batch` | Validate several EORI numbers at once |
 
 ## Pricing
-- **20 free calls per day per IP**, no signup.
-- After that, calls are paid with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.03 per KYB check.
-- The REST API on the same host (`https://eu-vat-checker.onrender.com`) uses the same x402 paywall.
+- **MCP endpoint:** 20 free tool calls per day per IP, no signup. When the quota is used up, the tool returns an error that points to the paid options below.
+- **REST API with x402** on the same host (`https://eu-vat-checker.onrender.com`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.03 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
+- **Apify Actors** (pay per event), see below.
 
 ## Also on Apify
 The same checks are available as Apify Actors (pay per event), and through Apify's hosted MCP server:
