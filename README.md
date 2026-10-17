@@ -78,6 +78,29 @@ The same checks are available as Apify Actors (pay per event), and through Apify
 
 Blog: https://wsystem.hashnode.dev
 
+## Ready-made examples (run in one click on Apify)
+
+Each example opens a pre-filled run with real sample output, so you can see the result format before you pay for anything:
+
+- [Check German VAT numbers (USt-IdNr.) in VIES](https://apify.com/wsystem/eu-vat-checker/examples/german-vat-number-check)
+- [Check French VAT numbers (TVA intracommunautaire)](https://apify.com/wsystem/eu-vat-checker/examples/french-vat-number-check)
+- [Check Italian VAT numbers (Partita IVA) in VIES](https://apify.com/wsystem/eu-vat-checker/examples/italian-vat-number-check)
+- [Check Spanish VAT numbers (NIF-IVA) in VIES](https://apify.com/wsystem/eu-vat-checker/examples/spanish-vat-number-check)
+- [Check Polish VAT numbers (NIP) in VIES](https://apify.com/wsystem/eu-vat-checker/examples/polish-vat-number-check)
+- [Bulk validate EU VAT numbers from many countries](https://apify.com/wsystem/eu-vat-checker/examples/bulk-eu-vat-validation)
+- [Bulk validate EU EORI numbers](https://apify.com/wsystem/eu-eori-checker/examples/bulk-eori-number-validation)
+- [Look up French companies by SIREN or name](https://apify.com/wsystem/european-company-registry/examples/french-company-lookup-siren)
+- [Search Nordic company registers (Norway, Finland)](https://apify.com/wsystem/european-company-registry/examples/nordic-company-register-search)
+- [Look up Czech and Polish companies (ARES, KRS)](https://apify.com/wsystem/european-company-registry/examples/czech-polish-company-lookup)
+- [Open IT and software tenders in Europe (TED)](https://apify.com/wsystem/eu-tenders-search/examples/it-software-tenders-europe)
+- [Open construction tenders in Germany (TED)](https://apify.com/wsystem/eu-tenders-search/examples/construction-tenders-germany)
+- [Medical equipment tenders in the EU (TED)](https://apify.com/wsystem/eu-tenders-search/examples/medical-equipment-tenders-eu)
+- [Screen names against the OFAC SDN list](https://apify.com/wsystem/sanctions-screening/examples/ofac-sdn-list-check)
+- [Screen names against the EU consolidated sanctions list](https://apify.com/wsystem/sanctions-screening/examples/eu-sanctions-list-check)
+- [Screen names against the UK sanctions list](https://apify.com/wsystem/sanctions-screening/examples/uk-sanctions-list-check)
+- [Supplier onboarding check: VAT, registry and sanctions](https://apify.com/wsystem/kyb-company-check/examples/supplier-onboarding-kyb-check)
+- [Verify B2B customers by VAT number](https://apify.com/wsystem/kyb-company-check/examples/b2b-customer-verification)
+
 ## Run it yourself
 ```bash
 pip install -r requirements.txt
