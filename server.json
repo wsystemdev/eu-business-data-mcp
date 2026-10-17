@@ -3,10 +3,10 @@
   "name": "io.github.zifengw/eu-business-data-mcp",
   "title": "EU Business Data (VAT, EORI, company, sanctions, KYB)",
   "description": "EU VAT (VIES) and EORI validation, company lookup, sanctions screening and KYB. x402 pay-per-call.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://github.com/zifengw/eu-business-data-mcp",
   "repository": {"url": "https://github.com/zifengw/eu-business-data-mcp", "source": "github"},
   "remotes": [
-    {"type": "streamable-http", "url": "https://eu-vat-checker.onrender.com/mcp/"}
+    {"type": "streamable-http", "url": "https://api.wsystem.dev/mcp/"}
   ]
 }

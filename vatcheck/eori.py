@@ -14,7 +14,7 @@ import httpx
 EOS_URL = "https://ec.europa.eu/taxation_customs/dds2/eos/validation/services/validation"
 SOURCE = "EORI (European Commission EOS)"
 SOURCE_URL = "https://ec.europa.eu/taxation_customs/dds2/eos/eori_validation.jsp"
-UA = "vatcheck-eori/1.0 (+https://eu-vat-checker.onrender.com)"
+UA = "vatcheck-eori/1.0 (+https://api.wsystem.dev)"
 NS = {"soap": "http://schemas.xmlsoap.org/soap/envelope/", "eori": "http://eori.ws.eos.dds.s/"}
 # After normalize: 2-letter country + 1–15 Basic Latin chars (total length 3–17).
 _FORMAT_RE = re.compile(r"^[A-Z]{2}[A-Za-z0-9+]{1,15}$")

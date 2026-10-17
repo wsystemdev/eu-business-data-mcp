@@ -5,7 +5,7 @@ from . import core, company, sanctions, kyb, eori
 
 mcp = FastMCP("eu-vat-checker", host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", 8001)))
 
-PUBLIC_URL = os.getenv("PUBLIC_URL", "https://eu-vat-checker.onrender.com")
+PUBLIC_URL = os.getenv("PUBLIC_URL", "https://api.wsystem.dev")
 MCP_FREE_PER_DAY = int(os.getenv("MCP_FREE_PER_DAY", 20))
 
 

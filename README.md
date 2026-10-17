@@ -9,12 +9,14 @@ A remote **MCP server** and **x402 pay-per-call API** for European business data
 ## Remote MCP endpoint (streamable HTTP)
 
 ```
-https://eu-vat-checker.onrender.com/mcp/
+https://api.wsystem.dev/mcp/
+
+(The previous URL `https://eu-vat-checker.onrender.com/mcp/` keeps working.)
 ```
 
 Example client config:
 ```json
-{ "mcpServers": { "eu-business-data": { "type": "http", "url": "https://eu-vat-checker.onrender.com/mcp/" } } }
+{ "mcpServers": { "eu-business-data": { "type": "http", "url": "https://api.wsystem.dev/mcp/" } } }
 ```
 
 ### Tools
@@ -30,7 +32,7 @@ Example client config:
 
 ## Pricing
 - **MCP endpoint:** 20 free tool calls per day per IP, no signup. When the quota is used up, the tool returns an error that points to the paid options below.
-- **REST API with x402** on the same host (`https://eu-vat-checker.onrender.com`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.03 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
+- **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.03 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
 - **Apify Actors** (pay per event), see below.
 
 ## Also on Apify
