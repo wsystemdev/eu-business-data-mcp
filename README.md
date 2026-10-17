@@ -38,7 +38,16 @@ Example client config:
 - **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
 - **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
+- Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup)
 - OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
+
+## When VIES is down (fallback) and UK numbers
+- VIES is retried with backoff. If a member state is still `MS_UNAVAILABLE`/timing out, the result comes from that country's free official source: **PL** Biała lista (Ministry of Finance), **CZ** ARES (VAT register status), **FI** YTJ open data (VAT register), **FR** Recherche d'entreprises / SIRENE (company active + VAT key; no free French VAT-registration API exists).
+- Otherwise the **last successful VIES answer** for that number is returned, labelled with its date. Otherwise `member_state_unavailable`.
+- Fallback results have `fallback: true`, `fallback_type` (`national_source` | `last_vies_result`), `source`, `legal_status`, `vies_error`, and **no consultation number**. National registers show domestic status, which is not VIES audit proof. Turn off with `fallback=false`.
+- No free automated source for DE (BZSt eVatR requires a German requester VAT ID), ES (certificate), IT (captcha), NL, BE, HU (NAV technical user), DK.
+- `GET /vies/status`: EC VIES per-country availability, cached 5 min, free.
+- **GB**: accepted and HMRC check-digit validated. Live check via HMRC *Check a UK VAT number* API v2 is implemented (`vatcheck/hmrc.py`) but needs OAuth app credentials from the HMRC Developer Hub (`HMRC_CLIENT_ID`, `HMRC_CLIENT_SECRET`, optional `HMRC_REQUESTER_VRN`); without them GB results return `status: not_configured`. **XI** is checked in VIES.
 
 ## Integration guides
 Step-by-step guides (every snippet tested against the live API): [docs/](docs/README.md)

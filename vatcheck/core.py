@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio, json, os, re, sqlite3, time
 from typing import Any
 import httpx
+from . import fallback as fb, hmrc
 
 VIES_URL = os.getenv("VIES_URL", "https://ec.europa.eu/taxation_customs/vies/rest-api/check-vat-number")
 DEFAULT_REQUESTER = os.getenv("VATCHECK_REQUESTER", "HU33119856")
@@ -25,15 +26,22 @@ TRANSIENT = {"MS_UNAVAILABLE", "TIMEOUT", "SERVICE_UNAVAILABLE", "MS_MAX_CONCURR
              "GLOBAL_MAX_CONCURRENT_REQ", "SERVER_BUSY", "MS_MAX_CONCURRENT_REQ_TIME", "GLOBAL_MAX_CONCURRENT_REQ_TIME"}
 
 
-def normalize(vat: str) -> tuple[str, str]:
+GB_FORMAT = r"(\d{9}|\d{12}|GD\d{3}|HA\d{3})"
+
+
+def normalize(vat: str, allow_gb: bool = False) -> tuple[str, str]:
     v = re.sub(r"[\s.\-/]", "", (vat or "").upper())
     if len(v) < 4 or not v[:2].isalpha():
         raise ValueError("VAT must start with a 2-letter country code, e.g. HU12345678")
     cc, num = v[:2], v[2:]
     if cc == "GR":
         cc = "EL"
+    if cc in ("GB", "UK") and allow_gb:
+        if not re.fullmatch(GB_FORMAT, num):
+            raise ValueError(f"GB{num} does not match the UK VAT format (9 or 12 digits, GD/HA + 3 digits)")
+        return "GB", num
     if cc not in FORMATS:
-        raise ValueError(f"Unsupported country code {cc}; VIES covers EU-27 + XI")
+        raise ValueError(f"Unsupported country code {cc}; supported: EU-27 + XI (VIES) and GB (HMRC)")
     if cc == "HU" and re.fullmatch(r"\d{11}", num):  # domestic HU tax number 12345678-2-42 -> first 8
         num = num[:8]
     if not re.fullmatch(FORMATS[cc], num):
@@ -138,11 +146,19 @@ async def _vies_call(client: httpx.AsyncClient, cc: str, num: str, req: str | No
 
 
 async def verify(vat: str, requester: str | None = DEFAULT_REQUESTER, use_cache: bool = True,
-                 client: httpx.AsyncClient | None = None) -> dict:
+                 client: httpx.AsyncClient | None = None, fallback: bool = True) -> dict:
     try:
-        cc, num = normalize(vat)
+        cc, num = normalize(vat, allow_gb=True)
     except ValueError as e:
         return {"input": vat, "status": "invalid_format", "valid": False, "error": str(e)}
+    if cc == "GB":
+        key = f"GB{num}|hmrc"
+        if use_cache and (hit := cache_get(key)):
+            return {**hit, "cached": True}
+        res = {"input": vat, **await hmrc.verify_gb(num, client), "cached": False}
+        if res["status"] in ("valid", "invalid"):
+            cache_put(key, res)
+        return res
     key = f"{cc}{num}|{requester or ''}"
     if use_cache and (hit := cache_get(key)):
         return {**hit, "cached": True}
@@ -153,11 +169,23 @@ async def verify(vat: str, requester: str | None = DEFAULT_REQUESTER, use_cache:
     finally:
         if own:
             await client.aclose()
+            client = None
     if "_error" in j:
         status = "member_state_unavailable" if j.get("_transient") else "error"
-        return {"input": vat, "vat": f"{cc}{num}", "country_code": cc, "status": status, "valid": None,
-                "error": j["_error"], "attempts": j["_attempts"],
-                "retry_after_seconds": 60 if j.get("_transient") else None}
+        out = {"input": vat, "vat": f"{cc}{num}", "country_code": cc, "status": status, "valid": None,
+               "error": j["_error"], "attempts": j["_attempts"],
+               "retry_after_seconds": 60 if j.get("_transient") else None}
+        if j.get("_transient") and fallback:
+            vies_info = {"vies_error": j["_error"], "vies_attempts": j["_attempts"], "input": vat, "requester": requester}
+            nat = await fb.national(cc, num, client)
+            if nat and "_national_error" not in nat:
+                return {**nat, **vies_info, "cached": False}
+            if (last := fb.last_vies(CACHE_PATH, cc, num)):
+                return {**last, **vies_info, **({"national_error": nat["_national_error"]} if nat else {})}
+            if nat:
+                out["national_error"] = nat["_national_error"]
+            out["fallback_note"] = fb.NATIONAL_SOURCES.get(cc, {}).get("note") or "No free national fallback source for this member state."
+        return out
     res = {
         "input": vat, "vat": f"{cc}{num}", "country_code": cc, "vat_number": num,
         "status": "valid" if j.get("valid") else "invalid", "valid": bool(j.get("valid")),
@@ -169,7 +197,29 @@ async def verify(vat: str, requester: str | None = DEFAULT_REQUESTER, use_cache:
     if cc == "HU":
         res["hu"] = hu_enrich(num, res["name"], res["address"])
     cache_put(key, res)
+    fb.remember_vies(CACHE_PATH, res)
     return res
+
+
+_status_cache: dict = {}
+
+async def vies_status(max_age: int = 300) -> dict:
+    """VIES per-member-state availability from the EC check-status endpoint, cached for max_age seconds."""
+    if _status_cache.get("ts", 0) > time.time() - max_age:
+        return _status_cache["data"]
+    url = VIES_URL.replace("check-vat-number", "check-status")
+    async with httpx.AsyncClient(headers={"User-Agent": "vatcheck/0.2"}) as c:
+        r = await c.get(url, timeout=20)
+        r.raise_for_status()
+        j = r.json()
+    import datetime as _dt
+    data = {"checked_at": _dt.datetime.now(_dt.timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds") + "Z", "source": url,
+            "vies_available": (j.get("vow") or {}).get("available"),
+            "countries": [{"country_code": x.get("countryCode"), "availability": x.get("availability"),
+                           "national_fallback": fb.NATIONAL_SOURCES.get(x.get("countryCode"), {}).get("status") == "implemented"}
+                          for x in j.get("countries", [])]}
+    _status_cache.update(ts=time.time(), data=data)
+    return data
 
 
 async def verify_batch(vats: list[str], requester: str | None = DEFAULT_REQUESTER, concurrency: int = 4) -> list[dict]:

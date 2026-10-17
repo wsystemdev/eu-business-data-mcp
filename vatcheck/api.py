@@ -38,10 +38,15 @@ app.include_router(discovery_router)
 async def health():
     return {"ok": True, "version": __version__}
 
-@app.get("/verify", tags=["VAT"], operation_id="verifyVat", summary='Validate one EU VAT number (VIES)', description='Check whether an EU VAT number (with country prefix, e.g. IE6388047V, DE811193231, HU33119856) is valid in the official VIES system. Returns `status` (valid | invalid | invalid_format | member_state_unavailable | error), `valid`, registered `name` and `address` where the member state discloses them, and a `consultation_number` (audit proof) when `requester` is a valid EU VAT. Use for reverse-charge invoicing, customer/supplier onboarding and checkout VAT exemption. Free 20/day per IP, then x402 $0.01.')
+@app.get("/vies/status", tags=["VAT"], operation_id="viesStatus", summary="VIES availability per member state (free, cached 5 min)",
+         description="Proxy of the European Commission VIES check-status endpoint, cached for 5 minutes. Free; does not use the free-tier quota. `national_fallback` = this API can answer from an official national source while that member state is down.")
+async def vies_status():
+    return await core.vies_status()
+
+@app.get("/verify", tags=["VAT"], operation_id="verifyVat", summary='Validate one EU VAT number (VIES)', description='Check whether an EU VAT number (with country prefix, e.g. IE6388047V, DE811193231, HU33119856) is valid in the official VIES system (GB numbers: HMRC). Returns `status` (valid | invalid | invalid_format | member_state_unavailable | error | not_configured), `valid`, registered `name` and `address` where the member state discloses them, and a `consultation_number` (audit proof) when `requester` is a valid EU VAT. If VIES is down for that member state, `fallback: true` answers come from an official national source (PL Biała lista, CZ ARES, FI YTJ, FR SIRENE) or the last successful VIES result with its date; fallbacks never carry a consultation number. Use for reverse-charge invoicing, customer/supplier onboarding and checkout VAT exemption. Free 20/day per IP, then x402 $0.01.')
 async def verify(vat: str = Query(..., examples=["HU33119856"]), requester: str | None = core.DEFAULT_REQUESTER,
-                 nocache: bool = False):
-    return await core.verify(vat, requester or None, use_cache=not nocache)
+                 nocache: bool = False, fallback: bool = True):
+    return await core.verify(vat, requester or None, use_cache=not nocache, fallback=fallback)
 
 @app.post("/verify/batch", tags=["VAT"], operation_id="verifyVatBatch", summary='Validate up to 100 EU VAT numbers', description='Batch VIES validation. Body: {"vats": [...], "requester": "optional own VAT"}. Same per-item result shape as GET /verify. x402 $0.10 per batch request after the free tier.')
 async def verify_batch(b: Batch):

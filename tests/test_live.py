@@ -29,7 +29,7 @@ def test_batch():
 def test_outage_handling(monkeypatch):
     monkeypatch.setattr(core, "VIES_URL", "https://httpbin.org/status/503")
     monkeypatch.setattr(core, "MAX_RETRIES", 1)
-    r = asyncio.run(core.verify("HU33119856", None, use_cache=False))
+    r = asyncio.run(core.verify("HU33119856", None, use_cache=False, fallback=False))
     assert r["status"] == "member_state_unavailable" and r["valid"] is None
 
 def test_free_tier_then_402(monkeypatch):
