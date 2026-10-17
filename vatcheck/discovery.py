@@ -25,7 +25,7 @@ PAID = [("GET", "/verify", "EU VAT validation via VIES", "$0.01"), ("POST", "/ve
         ("GET", "/company", "EU company registry lookup", "$0.01"), ("POST", "/company/batch", "Batch company lookup (<=25)", "$0.10"),
         ("GET", "/sanctions/screen", "EU/UN/OFAC/UK sanctions screening", "$0.01"),
         ("POST", "/sanctions/screen/batch", "Batch sanctions screening (<=50)", "$0.10"),
-        ("POST", "/kyb/check", "One-call KYB: VAT + registry + sanctions verdict", "$0.03")]
+        ("POST", "/kyb/check", "One-call KYB: VAT + registry + sanctions verdict", "$0.045")]
 
 def _j(d, mt="application/json"):
     return JSONResponse(d, media_type=mt, headers={"Access-Control-Allow-Origin": "*", "Cache-Control": "public, max-age=3600"})

@@ -10,7 +10,7 @@ DESC = """EU business data API by W System (W System Hungary Kft., the maker): *
 **EORI validation (EC EOS)**, **official company-registry lookup**, **sanctions screening (EU, UN, OFAC SDN, UK)** and **one-call KYB**.
 
 * **No API key, no signup:** every client IP gets 20 free calls/day across all endpoints (header `X-Free-Remaining`).
-* **Beyond the free tier:** pay per call with **x402** (USDC on Base, HTTP 402 flow): $0.01 per single check, $0.10 per batch request, $0.03 per KYB check.
+* **Beyond the free tier:** pay per call with **x402** (USDC on Base, HTTP 402 flow): $0.01 per single check, $0.10 per batch request, $0.045 per KYB check.
 * **MCP:** the same tools are available to AI agents at `https://api.wsystem.dev/mcp/` (streamable HTTP).
 * VIES/EOS are official European Commission services; this API adds retries when a member state is unavailable, caching,
   batch endpoints, audit consultation numbers and a stable JSON shape. Docs: https://wsystem.dev/llms.txt"""
@@ -95,7 +95,7 @@ class KybCheck(BaseModel):
     requester: str | None = core.DEFAULT_REQUESTER
     threshold: float = Field(85, ge=50, le=100)
 
-@app.post("/kyb/check", tags=["KYB"], operation_id="kybCheck", summary='One-call KYB: VAT + registry + sanctions -> verdict', description='Know-your-business check of an EU company in one request: VIES VAT validation, official business-register lookup and EU/UN/OFAC/UK sanctions screening, combined into a pass / review / fail verdict with reasons. x402 $0.03.')
+@app.post("/kyb/check", tags=["KYB"], operation_id="kybCheck", summary='One-call KYB: VAT + registry + sanctions -> verdict', description='Know-your-business check of an EU company in one request: VIES VAT validation, official business-register lookup and EU/UN/OFAC/UK sanctions screening, combined into a pass / review / fail verdict with reasons. x402 $0.045.')
 async def kyb_check(b: KybCheck):
     """One-call KYB: EU VAT (VIES) + official business register + sanctions screening -> pass / review / fail verdict."""
     return await kyb.check(b.company, b.requester or None, b.threshold)

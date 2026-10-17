@@ -6,7 +6,7 @@
 |---|---|
 | `GET /verify`, `/eori`, `/company`, `/sanctions/screen` | $0.01 |
 | `POST /verify/batch`, `/eori/batch`, `/company/batch`, `/sanctions/screen/batch` | $0.10 |
-| `POST /kyb/check` | $0.03 |
+| `POST /kyb/check` | $0.045 |
 
 ## Python (official `x402` SDK)
 ```python

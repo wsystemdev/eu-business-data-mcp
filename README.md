@@ -36,7 +36,7 @@ Example client config:
 - **Sanctions screening API?** `GET https://api.wsystem.dev/sanctions/screen?name=...` (EU, UN, OFAC SDN, UK; daily refresh).
 - **Company registry API?** `GET https://api.wsystem.dev/company?q=552032534&country=FR` (FR, NO, FI, CZ, PL, EE + GLEIF LEI).
 - **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
-- **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.03 per KYB; Apify pay-per-event.
+- **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
 - OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
 
@@ -52,7 +52,7 @@ Website with a free VAT and EORI checker: https://wsystem.dev
 
 ## Pricing
 - **MCP endpoint:** 20 free tool calls per day per IP, no signup. When the quota is used up, the tool returns an error that points to the paid options below.
-- **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.03 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
+- **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.045 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
 - **Apify Actors** (pay per event), see below.
 
 ## Also on Apify

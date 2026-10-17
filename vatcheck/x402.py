@@ -84,10 +84,10 @@ def _build_x402():
         "accepts": {**accepts, "price": PRICE_SANCTIONS}}
     routes["POST /sanctions/screen/batch"] = {"accepts": {**accepts, "price": PRICE_SANCTIONS_BATCH}, "mimeType": "application/json",
         "description": "Batch sanctions screening (EU, UN, OFAC, UK), up to 50 names per request"}
-    routes["POST /kyb/check"] = {**r("One-call KYB check of an EU company: VIES VAT validation + official business register + EU/UN/OFAC/UK sanctions screening -> pass/review/fail verdict ($0.03 per company)",
+    routes["POST /kyb/check"] = {**r("One-call KYB check of an EU company: VIES VAT validation + official business register + EU/UN/OFAC/UK sanctions screening -> pass/review/fail verdict ($0.045 per company)",
         declare_discovery_extension(input={"company": "FR40303265045"}, input_schema={"properties": {"company": {"description": "VAT ID, 'CC:name', or {name, vatNumber, country, registryId}"}, "threshold": {"type": "number"}}, "required": ["company"]},
             body_type="json", output=OutputConfig(example={"verdict": "pass", "reasons": []}))),
-        "accepts": {**accepts, "price": os.getenv("X402_PRICE_KYB", "$0.03")}}
+        "accepts": {**accepts, "price": os.getenv("X402_PRICE_KYB", "$0.045")}}
     routes["GET /eori"] = {**r("EU EORI number validation via official EC EOS: valid/invalid, name and address when disclosed",
         declare_discovery_extension(input={"eori": "SE5560360793"}, input_schema={"properties": {"eori": {"type": "string", "description": "EU EORI number with country prefix"}}, "required": ["eori"]},
             output=OutputConfig(example={"eori": "SE5560360793", "status": "valid", "valid": True, "name": "SAAB Aktiebolag", "city": "LINKÖPING", "country": "Sweden"}))),
