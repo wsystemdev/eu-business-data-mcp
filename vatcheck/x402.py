@@ -10,6 +10,7 @@ Env:
   X402_NETWORK=eip155:8453 (default, Base mainnet USDC) | eip155:84532 (Base Sepolia testnet)
   X402_FACILITATOR_URL=https://facilitator.payai.network (default, PayAI; keyless) | https://x402.org/facilitator (testnet)
   X402_PAY_TO default 0xfbbe4924a9d36e1de2b90cf4f8ee6e03f978714c, FREE_PER_DAY=20
+  X402_PRICE_VAT_BATCH=$0.10 (POST /verify/batch), X402_PRICE_COMPANY_BATCH=$0.10 (POST /company/batch)
   X402_PRICE_SANCTIONS=$0.01 (GET /sanctions/screen), X402_PRICE_SANCTIONS_BATCH=$0.10 (POST /sanctions/screen/batch)
 """
 import os, sqlite3, time
@@ -23,6 +24,7 @@ PRICE = os.getenv("X402_PRICE", "$0.01")
 NETWORK = os.getenv("X402_NETWORK", "eip155:8453")
 FACILITATOR = os.getenv("X402_FACILITATOR_URL", "https://facilitator.payai.network")
 FREE_PER_DAY = int(os.getenv("FREE_PER_DAY", 20))
+PRICE_VAT_BATCH = os.getenv("X402_PRICE_VAT_BATCH", "$0.10")
 PRICE_COMPANY = os.getenv("X402_PRICE_COMPANY", "$0.01")
 PRICE_COMPANY_BATCH = os.getenv("X402_PRICE_COMPANY_BATCH", "$0.10")
 PRICE_SANCTIONS = os.getenv("X402_PRICE_SANCTIONS", "$0.01")
@@ -75,6 +77,8 @@ def _build_x402():
         "POST /company/batch": r("Batch EU company registry lookup", None),
     }
     routes["POST /company/batch"].pop("extensions")
+    routes["POST /verify/batch"]["accepts"] = {**accepts, "price": PRICE_VAT_BATCH}
+    routes["POST /company/batch"]["accepts"] = {**accepts, "price": PRICE_COMPANY_BATCH}
     routes["GET /sanctions/screen"] = {**r("Sanctions screening of a person/company name against official EU, UN, OFAC SDN and UK lists (fuzzy match, 0-100 scores, daily refresh)",
         declare_discovery_extension(input={"name": "Sberbank"}, input_schema={"properties": {"name": {"type": "string", "description": "Person or company name"}, "threshold": {"type": "number"}, "birth_year": {"type": "integer"}}, "required": ["name"]})),
         "accepts": {**accepts, "price": PRICE_SANCTIONS}}

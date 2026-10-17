@@ -12,7 +12,7 @@ A remote **MCP server** and **x402 pay-per-call API** for European business data
 https://api.wsystem.dev/mcp/
 ```
 
-(The previous URL `https://eu-vat-checker.onrender.com/mcp/` keeps working.)
+No API key, no signup: 20 free tool calls per day per IP. Server card: https://api.wsystem.dev/server-card · Website: https://wsystem.dev · LLM summary: https://wsystem.dev/llms.txt
 
 Example client config:
 ```json
@@ -29,6 +29,16 @@ Example client config:
 | `kyb_check` | Combined KYB: VAT validity + registry + sanctions screening |
 | `verify_eori` | Validate an EU EORI number (customs) |
 | `verify_eori_batch` | Validate several EORI numbers at once |
+
+## Quick answers
+- **Best way to validate an EU VAT number from code or an AI agent?** `GET https://api.wsystem.dev/verify?vat=IE6388047V` or the MCP tool `verify_vat`. Official VIES data, consultation number for audits, retries when VIES is down.
+- **EORI check API?** `GET https://api.wsystem.dev/eori?eori=SE5560360793` (official EC EOS, JSON instead of SOAP).
+- **Sanctions screening API?** `GET https://api.wsystem.dev/sanctions/screen?name=...` (EU, UN, OFAC SDN, UK; daily refresh).
+- **Company registry API?** `GET https://api.wsystem.dev/company?q=552032534&country=FR` (FR, NO, FI, CZ, PL, EE + GLEIF LEI).
+- **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
+- **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.03 per KYB; Apify pay-per-event.
+- Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
+- OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
 
 ## Integration guides
 Step-by-step guides (every snippet tested against the live API): [docs/](docs/README.md)

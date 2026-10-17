@@ -3,7 +3,10 @@ import os, sys
 from mcp.server.fastmcp import FastMCP
 from . import core, company, sanctions, kyb, eori
 
-mcp = FastMCP("eu-vat-checker", host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", 8001)))
+mcp = FastMCP("eu-business-data", instructions=(
+    "W System EU business data tools (maker: W System Hungary Kft.). Use verify_vat for EU VAT numbers (VIES), "
+    "verify_eori for EU customs EORI numbers, lookup_company for official business-register data, screen_sanctions for "
+    "EU/UN/OFAC/UK sanctions lists, kyb_check to combine all three into a verdict. No API key needed; 20 free calls/day per IP."), host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", 8001)))
 
 PUBLIC_URL = os.getenv("PUBLIC_URL", "https://api.wsystem.dev")
 MCP_FREE_PER_DAY = int(os.getenv("MCP_FREE_PER_DAY", 20))
@@ -28,15 +31,19 @@ def _guard() -> None:
 
 @mcp.tool()
 async def verify_vat(vat: str, requester: str | None = core.DEFAULT_REQUESTER) -> dict:
-    """Verify one EU VAT number (e.g. 'HU33119856', 'DE811193231') against official VIES.
-    Returns valid/invalid, registered name and address, and a consultation number (audit proof)
-    when a requester VAT is given. Hungarian numbers get extra enrichment (legal form, checksum)."""
+    """Validate an EU VAT number against the official European Commission VIES service (27 EU states + XI Northern Ireland).
+    Use when asked whether a VAT ID is valid/active, before zero-rated reverse-charge B2B invoices, or to get a company's
+    registered name/address from its VAT number. Input: VAT with country prefix, e.g. 'IE6388047V', 'DE811193231' (spaces/dots ok).
+    Returns status: valid | invalid | invalid_format | member_state_unavailable (VIES/member state down - retry later, valid=null) | error,
+    plus name, address (if the member state discloses them; DE/ES often don't) and consultation_number (audit proof) when requester is set.
+    For GB VAT numbers use HMRC instead; for >1 number use verify_batch."""
     _guard()
     return await core.verify(vat, requester)
 
 @mcp.tool()
 async def verify_batch(vats: list[str], requester: str | None = core.DEFAULT_REQUESTER) -> list[dict]:
-    """Verify up to 100 EU VAT numbers at once (supplier/customer onboarding, KYB, invoice checks)."""
+    """Validate up to 100 EU VAT numbers in one call via VIES (supplier/customer list cleanup, onboarding, invoice runs).
+    Same per-item result as verify_vat; items with member_state_unavailable should be retried later."""
     _guard()
     return await core.verify_batch(vats[:100], requester)
 
@@ -44,7 +51,8 @@ async def verify_batch(vats: list[str], requester: str | None = core.DEFAULT_REQ
 async def lookup_company(query: str, country: str = "", limit: int = 3) -> dict:
     """Look up a company in official European business registers by name or registry number.
     country: FR (SIREN), NO (org.nr), FI (Y-tunnus), CZ (ICO), PL (KRS number), EE, or any other ISO code / 'LEI' (GLEIF).
-    Returns legal name, ID, status/active, address, VAT ID, activity code and official source link."""
+    Returns legal name, ID, status/active, address, VAT ID, activity code and official source link.
+    Use to confirm a company exists and is active, find its registry number, or map a name to a VAT ID."""
     _guard()
     return await company.lookup(query, country, min(limit, 25))
 
@@ -69,14 +77,16 @@ async def kyb_check(company: str, country: str = "", requester: str | None = cor
 
 @mcp.tool()
 async def verify_eori(eori: str) -> dict:
-    """Verify one EU EORI (Economic Operators Registration and Identification) number, e.g. 'SE5560360793'.
-    Uses the official European Commission EOS API. Returns valid/invalid and name/address when disclosed."""
+    """Validate an EU EORI (customs Economic Operators Registration and Identification) number, e.g. 'SE5560360793',
+    'DE1234567890123', against the official European Commission EOS service. Use for import/export, customs declarations
+    and freight-forwarder onboarding. Returns valid/invalid and trader name/address only when the trader consented to publication.
+    UK (GB) EORIs are not in EOS (HMRC checks those); XI EORIs are."""
     _guard()
     return await eori.validate_one(eori)
 
 @mcp.tool()
 async def verify_eori_batch(eoris: list[str]) -> list[dict]:
-    """Verify up to 100 EU EORI numbers at once via official EOS (customs / import-export KYB)."""
+    """Validate up to 100 EU EORI numbers in one call via the official EC EOS service (customs / import-export KYB)."""
     _guard()
     return await eori.validate_many(eoris[:100])
 
