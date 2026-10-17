@@ -36,6 +36,7 @@ Step-by-step guides (every snippet tested against the live API): [docs/](docs/RE
 - [REST from Python and JavaScript](docs/rest-python-js.md)
 - [n8n](docs/n8n.md) · [Make](docs/make.md) · [Zapier via Apify](docs/zapier.md)
 - [x402 agents (USDC on Base)](docs/x402-agents.md)
+- [Validate EU EORI numbers with the official EOS API](docs/eori-validation.md)
 
 Website with a free VAT and EORI checker: https://wsystem.dev
 
@@ -51,7 +52,8 @@ The same checks are available as Apify Actors (pay per event), and through Apify
 - [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search)
 - [wsystem/sanctions-screening](https://apify.com/wsystem/sanctions-screening)
 - [wsystem/kyb-company-check](https://apify.com/wsystem/kyb-company-check)
-- Apify MCP: `https://mcp.apify.com?tools=wsystem/eu-vat-checker,wsystem/european-company-registry,wsystem/sanctions-screening,wsystem/kyb-company-check`
+- [wsystem/eu-eori-checker](https://apify.com/wsystem/eu-eori-checker)
+- Apify MCP: `https://mcp.apify.com?tools=wsystem/eu-vat-checker,wsystem/european-company-registry,wsystem/sanctions-screening,wsystem/kyb-company-check,wsystem/eu-eori-checker`
 
 Blog: https://wsystem.hashnode.dev
 
