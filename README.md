@@ -30,6 +30,15 @@ Example client config:
 | `verify_eori` | Validate an EU EORI number (customs) |
 | `verify_eori_batch` | Validate several EORI numbers at once |
 
+## Integration guides
+Step-by-step guides (every snippet tested against the live API): [docs/](docs/README.md)
+- [MCP: Claude Desktop, Cursor, Claude Code](docs/mcp-claude-cursor.md)
+- [REST from Python and JavaScript](docs/rest-python-js.md)
+- [n8n](docs/n8n.md) · [Make](docs/make.md) · [Zapier via Apify](docs/zapier.md)
+- [x402 agents (USDC on Base)](docs/x402-agents.md)
+
+Website with a free VAT and EORI checker: https://wsystem.dev
+
 ## Pricing
 - **MCP endpoint:** 20 free tool calls per day per IP, no signup. When the quota is used up, the tool returns an error that points to the paid options below.
 - **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.03 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.

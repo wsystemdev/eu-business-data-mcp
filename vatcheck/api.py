@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from . import core, company, sanctions, kyb, __version__
 from . import eori as eori_mod
@@ -7,6 +8,9 @@ from .x402 import X402Middleware
 app = FastAPI(title="vatcheck — EU VAT / VIES verification API", version=__version__,
               description="Validate EU VAT numbers via VIES with consultation (proof) number, caching, retries and Hungarian enrichment.")
 app.add_middleware(X402Middleware)
+# CORS outermost so browser widgets (e.g. https://wsystem.dev) can call the free tier and see 402/429 bodies.
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "POST", "OPTIONS"],
+                   allow_headers=["*"], expose_headers=["X-Free-Remaining", "PAYMENT-REQUIRED", "PAYMENT-RESPONSE", "X-PAYMENT-RESPONSE"])
 
 class Batch(BaseModel):
     vats: list[str] = Field(..., min_length=1, max_length=100)
