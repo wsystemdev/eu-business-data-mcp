@@ -54,6 +54,7 @@ Step-by-step guides (every snippet tested against the live API): [docs/](docs/RE
 - [MCP: Claude Desktop, Cursor, Claude Code](docs/mcp-claude-cursor.md)
 - [REST from Python and JavaScript](docs/rest-python-js.md)
 - [n8n](docs/n8n.md) · [Make](docs/make.md) · [Zapier via Apify](docs/zapier.md)
+- **Make app (native, custom app):** [install W System in Make](https://www.make.com/en/hq/app-invitation/e2fadd990d4db5e5c354e16bcb82252d) with Check VAT Number, Check VAT Numbers (Batch), Check EORI Number and Search Companies modules. API key optional (free tier 20 calls/day).
 - **Zapier app (beta, native):** [add W System to Zapier](https://zapier.com/developer/public-invite/248028/559e8fc91afe8aa9a3f9186710a670ea/) for VAT check and sanctions screening actions.
 - [x402 agents (USDC on Base)](docs/x402-agents.md)
 - [Validate EU EORI numbers with the official EOS API](docs/eori-validation.md)
