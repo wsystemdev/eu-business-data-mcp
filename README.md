@@ -10,9 +10,9 @@ A remote **MCP server** and **x402 pay-per-call API** for European business data
 
 ```
 https://api.wsystem.dev/mcp/
+```
 
 (The previous URL `https://eu-vat-checker.onrender.com/mcp/` keeps working.)
-```
 
 Example client config:
 ```json
