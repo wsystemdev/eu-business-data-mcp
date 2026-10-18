@@ -6,7 +6,7 @@ from . import core, company, sanctions, kyb, eori
 mcp = FastMCP("eu-business-data", instructions=(
     "W System EU business data tools (maker: W System Hungary Kft.). Use verify_vat for EU VAT numbers (VIES), "
     "verify_eori for EU customs EORI numbers, lookup_company for official business-register data, screen_sanctions for "
-    "EU/UN/OFAC/UK sanctions lists, kyb_check to combine all three into a verdict. No API key needed; 20 free calls/day per IP."), host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", 8001)))
+    "EU/UN/OFAC/UK sanctions lists, kyb_check to combine all three into a verdict, validate_einvoice / create_einvoice for EN 16931 and XRechnung e-invoices. No API key needed; 20 free calls/day per IP."), host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", 8001)))
 
 PUBLIC_URL = os.getenv("PUBLIC_URL", "https://api.wsystem.dev")
 MCP_FREE_PER_DAY = int(os.getenv("MCP_FREE_PER_DAY", 20))
@@ -93,3 +93,56 @@ async def verify_eori_batch(eoris: list[str]) -> list[dict]:
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "stdio"
     mcp.run(transport="streamable-http" if mode == "http" else "stdio")
+
+
+@mcp.tool()
+async def validate_einvoice(xml: str, rules: str = "auto") -> dict:
+    """Validate an EU e-invoice XML (UBL 2.1 Invoice/CreditNote or UN/CEFACT CII, e.g. XRechnung, Factur-X/ZUGFeRD XML) against the
+    official CEN EN 16931 rules and, for XRechnung, the KoSIT XRechnung 3.0 rules. Returns valid, and every error with its rule ID
+    (e.g. BR-CO-10), a plain-English message, XPath and a fix hint. rules: auto | en16931 | xrechnung. Peppol-specific rules are not checked yet.
+    For PDFs use the REST endpoint POST /einvoice/validate."""
+    _guard()
+    import asyncio
+    from . import einvoice
+    try:
+        return await asyncio.to_thread(einvoice.validate, xml.encode("utf-8"), rules)
+    except einvoice.InputError as e:
+        return {"error": "bad_input", "detail": str(e)}
+
+
+@mcp.tool()
+async def create_einvoice(invoice: dict) -> dict:
+    """Create a validated EU e-invoice (UBL 2.1) from simple JSON. invoice = {format: en16931|xrechnung|peppol-bis3, invoice_number,
+    issue_date (YYYY-MM-DD), due_date?, currency (EUR), buyer_reference?, seller: {name, vat_id, street, city, postal_code, country, email,
+    phone, contact_name}, buyer: {...}, lines: [{description, quantity, unit_price, unit?, vat_category (S|Z|E|AE|K|G|O), vat_rate}],
+    payment: {iban, bic?, terms?}}. Totals and VAT breakdown are computed; returns {valid, xml, totals, errors}."""
+    _guard()
+    import asyncio
+    from . import einvoice
+    try:
+        return await asyncio.to_thread(einvoice.create, invoice)
+    except einvoice.InputError as e:
+        return {"error": "bad_input", "detail": str(e)}
+
+
+@mcp.tool()
+async def einvoice_route(id: str) -> dict:
+    """'Can I e-invoice this company?' id = EU VAT number (e.g. 'BE0403170701') or Peppol id ('0208:0403170701').
+    Returns VIES VAT status, Peppol Directory registration (BIS 3 invoice support), the country's B2B e-invoice mandate
+    (dates, format, source) and the recommended format for create_einvoice. France's PPF directory is not included yet."""
+    _guard()
+    from . import einvoice_route as er
+    try:
+        return await er.route(id)
+    except ValueError as e:
+        return {"error": "bad_input", "detail": str(e)}
+
+
+@mcp.tool()
+async def due_diligence_report(company: str, country: str = "") -> dict:
+    """Counterparty due-diligence report in one call: VIES VAT, official business register, EU/UN/OFAC/UK sanctions,
+    EC EORI, GLEIF LEI and Peppol e-invoice route, with deterministic risk flags, 0-100 risk score, pass/review/fail
+    verdict, sources and UTC timestamp. company: VAT ID (best), registry number or name; country: ISO code for names."""
+    _guard()
+    from . import ddreport
+    return await ddreport.report(company, country)
