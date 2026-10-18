@@ -4,7 +4,7 @@ from mcp.server.fastmcp import FastMCP
 from . import core, company, sanctions, kyb, eori
 
 mcp = FastMCP("eu-business-data", instructions=(
-    "W System EU business data tools (maker: W System Hungary Kft.). Use verify_vat for EU VAT numbers (VIES), "
+    "W System EU business data tools (maker: W System). Use verify_vat for EU VAT numbers (VIES), "
     "verify_eori for EU customs EORI numbers, lookup_company for official business-register data, screen_sanctions for "
     "EU/UN/OFAC/UK sanctions lists, kyb_check to combine all three into a verdict, validate_einvoice / create_einvoice for EN 16931 and XRechnung e-invoices. No API key needed; 20 free calls/day per IP."), host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", 8001)))
 

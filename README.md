@@ -4,7 +4,7 @@
 
 A remote **MCP server** and **x402 pay-per-call API** for European business data checks, aimed at AI agents and KYB/onboarding/invoicing workflows.
 
-> **Maker disclosure:** built and operated by **W System Hungary Kft.** (EU VAT HU33119856). This is our own commercial product. The code is MIT-licensed.
+> **Maker disclosure:** built and operated by **W System**. This is our own commercial product. The code is MIT-licensed.
 
 ## Remote MCP endpoint (streamable HTTP)
 

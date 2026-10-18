@@ -127,4 +127,4 @@ async def report(company: str, country: str = "", requester: str | None = None, 
                         "sanctions": "EU consolidated, UN SC, US OFAC SDN, UK sanctions lists (daily)", "eori": "EC EOS",
                         "lei": "GLEIF API (CC0)", "peppol": "Peppol Directory"},
             "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "ms": int((time.time() - t0) * 1000),
-            "maker": "W System (W System Hungary Kft.)", "disclaimer": DISCLAIMER}
+            "maker": "W System", "disclaimer": DISCLAIMER}

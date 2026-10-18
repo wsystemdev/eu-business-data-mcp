@@ -6,7 +6,7 @@ from . import eori as eori_mod
 from .x402 import X402Middleware
 from .discovery import router as discovery_router
 
-DESC = """EU business data API by W System (W System Hungary Kft., the maker): **EU VAT number validation (VIES)**,
+DESC = """EU business data API by W System (the maker): **EU VAT number validation (VIES)**,
 **EORI validation (EC EOS)**, **official company-registry lookup**, **sanctions screening (EU, UN, OFAC SDN, UK)** and **one-call KYB**.
 
 * **No API key, no signup:** every client IP gets 20 free calls/day across all endpoints (header `X-Free-Remaining`).

@@ -1,6 +1,6 @@
 # Validate EU EORI numbers with the official EOS API
 
-*Disclosure: I'm the maker of the EORI checker linked at the end (W System Hungary Kft.). Everything before that section works with free, official endpoints only.*
+*Disclosure: I'm the maker of the EORI checker linked at the end (W System). Everything before that section works with free, official endpoints only.*
 
 If you import into or export out of the EU, every customs declaration carries an EORI number (Economic Operators Registration and Identification). Freight forwarders, customs brokers and marketplaces check these numbers when onboarding a shipper, and a typo or a deregistered number means a held shipment. The European Commission runs a free validation service called EOS. It has a web form, but for anything automated you'll want its SOAP API. Here is what works today, including two gotchas that cost me time.
 

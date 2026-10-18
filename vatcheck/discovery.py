@@ -18,7 +18,7 @@ SERVER_CARD = {
     "remotes": [{"type": "streamable-http", "url": f"{BASE}/mcp/"}],
     "_meta": {"dev.wsystem/tools": ["verify_vat", "verify_batch", "verify_eori", "verify_eori_batch",
                                     "lookup_company", "screen_sanctions", "kyb_check"],
-              "dev.wsystem/maker": "W System Hungary Kft."},
+              "dev.wsystem/maker": "W System"},
 }
 PAID = [("GET", "/verify", "EU VAT validation via VIES", "$0.01"), ("POST", "/verify/batch", "Batch VIES VAT validation (<=100)", "$0.10"),
         ("GET", "/eori", "EU EORI validation via EC EOS", "$0.01"), ("POST", "/eori/batch", "Batch EORI validation (<=100)", "$0.10"),
