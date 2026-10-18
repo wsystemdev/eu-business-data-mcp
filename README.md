@@ -32,6 +32,7 @@ Example client config:
 | `validate_einvoice` | Validate a UBL or CII e-invoice against the official EN 16931 and XRechnung rules: errors with rule IDs, plain-English messages and fix hints |
 | `create_einvoice` | Turn simple JSON into a validated UBL 2.1 invoice (EN 16931, XRechnung or Peppol BIS 3 structure) |
 | `einvoice_route` | "Can I e-invoice this company?": VIES + Peppol Directory + country B2B mandate + recommended format |
+| `send_einvoice_sandbox` | SANDBOX: verify buyer VAT + sanctions → create/validate EN 16931 → route → mock transport (nothing transmitted) → Ed25519-signed evidence receipt |
 | `due_diligence_report` | VAT, register, sanctions, EORI, GLEIF LEI and Peppol in one report with risk flags and a timestamp |
 
 ## Quick answers
@@ -39,10 +40,10 @@ Example client config:
 - **EORI check API?** `GET https://api.wsystem.dev/eori?eori=SE5560360793` (official EC EOS, JSON instead of SOAP).
 - **Sanctions screening API?** `GET https://api.wsystem.dev/sanctions/screen?name=...` (EU, UN, OFAC SDN, UK; daily refresh).
 - **Company registry API?** `GET https://api.wsystem.dev/company?q=552032534&country=FR` (FR, NO, FI, CZ, PL, EE + GLEIF LEI).
-- **E-invoice validation API (EN 16931, XRechnung, ZUGFeRD/Factur-X)?** `POST https://api.wsystem.dev/einvoice/validate` with the XML or PDF as the body. Create: `POST /einvoice/create` (example body: `GET /einvoice/sample`). Routing: `GET /einvoice/route?id=BE0403170701`. Peppol BIS 3 specific rules are not checked yet. Rule artefacts: CEN EN 16931 (EUPL-1.2, https://github.com/ConnectingEurope/eInvoicing-EN16931) and KoSIT XRechnung configuration (Apache-2.0, https://github.com/itplr-kosit/validator-configuration-xrechnung), downloaded unmodified at runtime. Page: https://wsystem.dev/eu-e-invoice-validation-api
+- **E-invoice validation API (EN 16931, XRechnung, ZUGFeRD/Factur-X)?** `POST https://api.wsystem.dev/einvoice/validate` with the XML or PDF as the body. Create: `POST /einvoice/create` (example body: `GET /einvoice/sample`). Routing: `GET /einvoice/route?id=BE0403170701`. **SANDBOX send** (verify → create → route → mock transport → signed evidence): `POST /einvoice/send` (public key: `GET /einvoice/evidence-key`). Peppol BIS 3 specific rules are not checked yet; live Peppol transmission is not available. Rule artefacts: CEN EN 16931 (EUPL-1.2, https://github.com/ConnectingEurope/eInvoicing-EN16931) and KoSIT XRechnung configuration (Apache-2.0, https://github.com/itplr-kosit/validator-configuration-xrechnung), downloaded unmodified at runtime. Pages: https://wsystem.dev/eu-e-invoice-validation-api · https://wsystem.dev/e-invoicing-api
 - **Counterparty due-diligence report?** `POST https://api.wsystem.dev/ddreport` `{"company":"FR40303265045"}`.
 - **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
-- **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.08 e-invoice create, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
+- **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [E-invoice](https://wsystem.dev/eu-e-invoice-validation-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
 - Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup)
 - OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
