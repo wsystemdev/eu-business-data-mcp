@@ -1,6 +1,6 @@
 # Validate EU EORI numbers with the official EOS API
 
-*Disclosure: I'm the maker of the EORI checker linked at the end (W System). Everything before that section works with free, official endpoints only.*
+Validate EU EORI numbers for free with the European Commission's EOS SOAP service: a tested Python example and two gotchas (the 502 on the default User-Agent, and GB numbers no longer in EOS).
 
 If you import into or export out of the EU, every customs declaration carries an EORI number (Economic Operators Registration and Identification). Freight forwarders, customs brokers and marketplaces check these numbers when onboarding a shipper, and a typo or a deregistered number means a held shipment. The European Commission runs a free validation service called EOS. It has a web form, but for anything automated you'll want its SOAP API. Here is what works today, including two gotchas that cost me time.
 
@@ -119,6 +119,8 @@ A robust checker routes by prefix: `GB` goes to HMRC, everything else (EU-27 plu
 - **EORI is not VAT.** In many EU countries the EORI is based on the company's VAT or tax number, but it's a separate registration: a valid VAT number doesn't mean the company has an EORI, and vice versa. Check VAT numbers against VIES separately.
 
 ## If you'd rather not maintain the SOAP plumbing
+*Disclosure: I'm the maker of the EORI checker below (W System).*
+
 
 I built two hosted versions of the above, with the input cleaning, format checks, chunking and retries done for you:
 
