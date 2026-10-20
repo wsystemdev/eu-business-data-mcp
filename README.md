@@ -65,6 +65,7 @@ Step-by-step guides (every snippet tested against the live API): [docs/](docs/RE
 - **Zapier app (beta, native):** [add W System to Zapier](https://zapier.com/developer/public-invite/248028/559e8fc91afe8aa9a3f9186710a670ea/) for VAT check and sanctions screening actions.
 - [x402 agents (USDC on Base)](docs/x402-agents.md)
 - [Validate EU EORI numbers with the official EOS API](docs/eori-validation.md)
+- [Validate EU VAT numbers directly against VIES in Python](https://github.com/wsystemdev/vies-vat-validation-python): one zero-dependency file with retries for MS_UNAVAILABLE, CSV batch and consultation numbers (no W System account needed)
 
 Website with a free VAT and EORI checker: https://wsystem.dev
 
