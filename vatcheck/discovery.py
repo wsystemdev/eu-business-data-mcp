@@ -8,9 +8,9 @@ router = APIRouter(include_in_schema=False)
 
 SERVER_CARD = {
     "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
-    "name": "io.github.zifengw/eu-business-data-mcp",
+    "name": "io.github.wsystemdev/eu-business-data-mcp",
     "title": "W System EU Business Data (VAT/VIES, EORI, company registry, sanctions, KYB)",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "EU VAT number validation (VIES), EORI validation (EC EOS), official company-registry lookup, "
                    "EU/UN/OFAC/UK sanctions screening and one-call KYB. Free 20 calls/day per IP, no API key; x402 pay-per-call beyond.",
     "websiteUrl": "https://wsystem.dev",

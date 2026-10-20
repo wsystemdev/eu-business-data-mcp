@@ -1,6 +1,6 @@
 # EU Business Data MCP – VAT, EORI, company registry, sanctions, KYB & e-invoicing
 
-<!-- mcp-name: io.github.zifengw/eu-business-data-mcp -->
+<!-- mcp-name: io.github.wsystemdev/eu-business-data-mcp -->
 
 A remote **MCP server** and **x402 pay-per-call API** for European business data checks, aimed at AI agents and KYB/onboarding/invoicing workflows.
 
