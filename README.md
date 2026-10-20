@@ -34,6 +34,7 @@ Example client config:
 | `einvoice_route` | "Can I e-invoice this company?": VIES + Peppol Directory + country B2B mandate + recommended format |
 | `send_einvoice_sandbox` | SANDBOX: verify buyer VAT + sanctions → create/validate EN 16931 → route → mock transport (nothing transmitted) → Ed25519-signed evidence receipt |
 | `due_diligence_report` | VAT, register, sanctions, EORI, GLEIF LEI and Peppol in one report with risk flags and a timestamp |
+| `check_fr_pa_registry` | France: is this e-invoicing platform on the official DGFiP list of Plateformes Agréées (PA)? Name or website in; approved / awaiting interop tests / not found, registration date and official source out (also free as REST: `GET https://api.wsystem.dev/fr/pa-registry?name=Pennylane`) |
 
 ## Quick answers
 - **Best way to validate an EU VAT number from code or an AI agent?** `GET https://api.wsystem.dev/verify?vat=IE6388047V` or the MCP tool `verify_vat`. Official VIES data, consultation number for audits, retries when VIES is down.
