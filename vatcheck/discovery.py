@@ -14,7 +14,7 @@ SERVER_CARD = {
     "description": "EU VAT number validation (VIES), EORI validation (EC EOS), official company-registry lookup, "
                    "EU/UN/OFAC/UK sanctions screening and one-call KYB. Free 20 calls/day per IP, no API key; x402 pay-per-call beyond.",
     "websiteUrl": "https://wsystem.dev",
-    "repository": {"url": "https://github.com/zifengw/eu-business-data-mcp", "source": "github"},
+    "repository": {"url": "https://github.com/wsystemdev/eu-business-data-mcp", "source": "github"},
     "remotes": [{"type": "streamable-http", "url": f"{BASE}/mcp/"}],
     "_meta": {"dev.wsystem/tools": ["verify_vat", "verify_batch", "verify_eori", "verify_eori_batch",
                                     "lookup_company", "screen_sanctions", "kyb_check"],

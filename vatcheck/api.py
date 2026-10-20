@@ -22,7 +22,7 @@ TAGS = [{"name": "VAT", "description": "EU VAT number validation via VIES (27 EU
 app = FastAPI(title="W System EU Business Data API (VAT/VIES, EORI, company registry, sanctions, KYB)", version=__version__,
               description=DESC, openapi_tags=TAGS, servers=[{"url": "https://api.wsystem.dev", "description": "Production"}],
               contact={"name": "W System", "url": "https://wsystem.dev"},
-              license_info={"name": "Proprietary API; MCP server code MIT", "url": "https://github.com/zifengw/eu-business-data-mcp"})
+              license_info={"name": "Proprietary API; MCP server code MIT", "url": "https://github.com/wsystemdev/eu-business-data-mcp"})
 app.add_middleware(X402Middleware)
 # CORS outermost so browser widgets (e.g. https://wsystem.dev) can call the free tier and see 402/429 bodies.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "POST", "OPTIONS"],
