@@ -125,6 +125,6 @@ A robust checker routes by prefix: `GB` goes to HMRC, everything else (EU-27 plu
 I built two hosted versions of the above, with the input cleaning, format checks, chunking and retries done for you:
 
 - **Apify Actor:** [EU EORI Number Checker](https://apify.com/wsystem/eu-eori-checker). Batch up to 1,000 EORIs per run, JSON or CSV out, $0.005 per answered check plus $0.005 per run. Format errors and EOS outages aren't charged. It also works as a tool for AI agents through Apify's MCP server (`https://mcp.apify.com/?tools=wsystem/eu-eori-checker`).
-- **HTTP API / MCP server:** `GET https://api.wsystem.dev/eori?eori=SE5560360793` and `POST /eori/batch`, plus a remote MCP endpoint at `https://api.wsystem.dev/mcp/` with a `verify_eori` tool. 20 free calls per day per IP, then pay per call in USDC via x402. Source on [GitHub](https://github.com/wsystemdev/eu-business-data-mcp).
+- **HTTP API / MCP server:** `GET https://api.wsystem.dev/eori?eori=SE5560360793` and `POST /eori/batch`, plus a remote MCP endpoint at `https://api.wsystem.dev/mcp/` with a `verify_eori` tool. 20 free calls per day per IP on REST (MCP: 20 tool calls per day per session), then pay per call in USDC via x402. Source on [GitHub](https://github.com/wsystemdev/eu-business-data-mcp).
 
 Either way, the official endpoint above is free and works fine if you'd rather run it yourself.

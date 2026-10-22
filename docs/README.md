@@ -10,5 +10,5 @@
 | [x402 agents](x402-agents.md) | Autonomous agents paying per call in USDC on Base |
 | [Validate EORI numbers (official EOS API)](eori-validation.md) | Customs, freight and marketplace onboarding; DIY or hosted |
 
-All examples use the public API at `https://api.wsystem.dev` (20 free calls per day per IP, then x402) or our Apify Actors (`wsystem/...`, pay per event).
+All examples use the public API at `https://api.wsystem.dev` (REST: 20 free calls per day per IP, then x402; MCP: 20 free tool calls per day per session, see [mcp-claude-cursor.md](mcp-claude-cursor.md)) or our Apify Actors (`wsystem/...`, pay per event).
 Built and operated by W System (maker disclosure). Data comes live from public EC services (VIES, EOS), public registers and official sanctions lists; not affiliated with the European Commission; not legal or tax advice.

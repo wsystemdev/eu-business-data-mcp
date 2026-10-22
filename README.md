@@ -12,7 +12,11 @@ A remote **MCP server** and **x402 pay-per-call API** for European business data
 https://api.wsystem.dev/mcp/
 ```
 
-No API key, no signup: 20 free tool calls per day per IP. Server card: https://api.wsystem.dev/server-card · Website: https://wsystem.dev · LLM summary: https://wsystem.dev/llms.txt
+Free tier, no signup: **20 tool calls per day per MCP session**. Direct clients (Claude Code, Cursor, mcp-remote and others connecting from your own machine) also get at most 20 per IP, so opening more sessions doesn't add calls. Claude.ai / Claude Desktop custom connectors call from Anthropic's cloud ([outbound range 160.79.104.0/21](https://docs.anthropic.com/en/api/ip-addresses)), so those calls are counted per session, not per IP; all keyless traffic from that range shares **2,000 lookups per day** (`verify_batch` / `verify_eori_batch` count one per number). New keyless sessions: 1,500 per IP per day (3,000 per Anthropic address). Limits reset at 00:00 UTC; live values: https://api.wsystem.dev/mcp/limits
+
+Optional **API key** for volume: send `X-API-Key: <key>` (or `Authorization: Bearer <key>`) with every MCP request. Keyed calls use the key's monthly units (same weights as the REST API) instead of the free tier. Keys: https://wsystem.dev/pricing (Starter EUR 19/month, 5,000 units; Pro EUR 49/month, 25,000 units; there is no free key). Keys in the URL are not accepted. How to add one in Claude: [docs/mcp-claude-cursor.md](docs/mcp-claude-cursor.md#api-key).
+
+Server card: https://api.wsystem.dev/server-card · Website: https://wsystem.dev · LLM summary: https://wsystem.dev/llms.txt
 
 Example client config:
 ```json
@@ -44,7 +48,7 @@ Example client config:
 - **E-invoice validation API (EN 16931, XRechnung, ZUGFeRD/Factur-X)?** `POST https://api.wsystem.dev/einvoice/validate` with the XML or PDF as the body. Create: `POST /einvoice/create` (example body: `GET /einvoice/sample`). Routing: `GET /einvoice/route?id=BE0403170701`. **SANDBOX send** (verify → create → route → mock transport → signed evidence): `POST /einvoice/send` (public key: `GET /einvoice/evidence-key`). Peppol BIS 3 specific rules are not checked yet; live Peppol transmission is not available. Rule artefacts: CEN EN 16931 (EUPL-1.2, https://github.com/ConnectingEurope/eInvoicing-EN16931) and KoSIT XRechnung configuration (Apache-2.0, https://github.com/itplr-kosit/validator-configuration-xrechnung), downloaded unmodified at runtime. Pages: https://wsystem.dev/eu-e-invoice-validation-api · https://wsystem.dev/e-invoicing-api
 - **Counterparty due-diligence report?** `POST https://api.wsystem.dev/ddreport` `{"company":"FR40303265045"}`.
 - **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
-- **Pricing:** 20 calls/day free per IP; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
+- **Pricing:** REST 20 calls/day free per IP, MCP 20 tool calls/day per session; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [E-invoice](https://wsystem.dev/eu-e-invoice-validation-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
 - Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup)
 - OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
@@ -71,7 +75,7 @@ Step-by-step guides (every snippet tested against the live API): [docs/](docs/RE
 Website with a free VAT and EORI checker: https://wsystem.dev
 
 ## Pricing
-- **MCP endpoint:** 20 free tool calls per day per IP, no signup. When the quota is used up, the tool returns an error that points to the paid options below.
+- **MCP endpoint:** free, 20 tool calls per day per MCP session (details and the shared limit for Claude connector traffic above). With an API key in `X-API-Key`: Starter EUR 19/month (5,000 units) or Pro EUR 49/month (25,000 units). When a free limit is reached, the tool returns an error that names the limit and explains how to add a key.
 - **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.045 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
 - **Apify Actors** (pay per event), see below.
 

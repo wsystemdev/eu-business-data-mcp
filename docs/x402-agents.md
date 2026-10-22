@@ -48,4 +48,4 @@ console.log(res.status, await res.json());
 ```bash
 curl -i "https://api.wsystem.dev/verify?vat=IE6388047V"   # after the free quota: HTTP 402 + PAYMENT-REQUIRED header
 ```
-The service is also listed in the x402 Bazaar. MCP clients use the free MCP endpoint instead (see [mcp-claude-cursor.md](mcp-claude-cursor.md)).
+The service is also listed in the x402 Bazaar. MCP clients use the MCP endpoint instead: free per session, or with an `X-API-Key` header (see [mcp-claude-cursor.md](mcp-claude-cursor.md)).
