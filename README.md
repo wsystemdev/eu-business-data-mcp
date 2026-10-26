@@ -50,7 +50,8 @@ Example client config:
 - **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
 - **Pricing:** REST 20 calls/day free per IP, MCP 20 tool calls/day per session; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [E-invoice](https://wsystem.dev/eu-e-invoice-validation-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
-- Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup)
+- Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup) · [Peppol ID lookup](https://wsystem.dev/peppol-id-lookup)
+- CI: [einvoice-validate-action](https://github.com/wsystemdev/einvoice-validate-action) validates UBL/CII/ZUGFeRD invoices in GitHub Actions with inline rule annotations (free tier, no key needed to start)
 - OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
 
 ## When VIES is down (fallback) and UK numbers
