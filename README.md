@@ -74,6 +74,7 @@ Step-by-step guides (every snippet tested against the live API): [docs/](docs/RE
 - [Validate EU VAT numbers directly against VIES in Python](https://github.com/wsystemdev/vies-vat-validation-python): one zero-dependency file with retries for MS_UNAVAILABLE, CSV batch and consultation numbers (no W System account needed)
 
 Website with a free VAT and EORI checker: https://wsystem.dev
+REST API docs and a free API key (no card): https://api.wsystem.dev/docs?ref=mcp-github
 
 ## Pricing
 - **MCP endpoint:** free, 20 tool calls per day per MCP session (details and the shared limit for Claude connector traffic above). With an API key in `X-API-Key`: Starter EUR 19/month (5,000 units) or Pro EUR 49/month (25,000 units). When a free limit is reached, the tool returns an error that names the limit and explains how to add a key.
