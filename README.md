@@ -23,7 +23,7 @@ Example client config:
 { "mcpServers": { "eu-business-data": { "type": "http", "url": "https://api.wsystem.dev/mcp/" } } }
 ```
 
-### Tools
+### Tools (14)
 | Tool | What it does |
 |---|---|
 | `verify_vat` | Validate an EU VAT number live against VIES (27 EU states + XI), with name/address and optional consultation number |
@@ -34,6 +34,7 @@ Example client config:
 | `verify_eori` | Validate an EU EORI number (customs) |
 | `verify_eori_batch` | Validate several EORI numbers at once |
 | `validate_einvoice` | Validate a UBL or CII e-invoice against the official EN 16931 and XRechnung rules: errors with rule IDs, plain-English messages and fix hints |
+| `parse_einvoice` | Read an incoming e-invoice (UBL Invoice/CreditNote, CII, or the XML inside a ZUGFeRD / Factur-X PDF as base64) into one JSON shape: seller, buyer, dates, references, totals, VAT breakdown, payment/IBAN, lines, attachments. Values as written, no validation (use `validate_einvoice`). Guide: [read XRechnung / ZUGFeRD as JSON](https://wsystem.dev/read-xrechnung-zugferd-json-api?ref=mcp-github) |
 | `create_einvoice` | Turn simple JSON into a validated UBL 2.1 invoice (EN 16931, XRechnung or Peppol BIS 3 structure) |
 | `einvoice_route` | "Can I e-invoice this company?": VIES + Peppol Directory + country B2B mandate + recommended format |
 | `send_einvoice_sandbox` | SANDBOX: verify buyer VAT + sanctions → create/validate EN 16931 → route → mock transport (nothing transmitted) → Ed25519-signed evidence receipt |
@@ -48,7 +49,7 @@ Example client config:
 - **E-invoice validation API (EN 16931, XRechnung, ZUGFeRD/Factur-X)?** `POST https://api.wsystem.dev/einvoice/validate` with the XML or PDF as the body. Create: `POST /einvoice/create` (example body: `GET /einvoice/sample`). Routing: `GET /einvoice/route?id=BE0403170701`. **SANDBOX send** (verify → create → route → mock transport → signed evidence): `POST /einvoice/send` (public key: `GET /einvoice/evidence-key`). Peppol BIS 3 specific rules are not checked yet; live Peppol transmission is not available. Rule artefacts: CEN EN 16931 (EUPL-1.2, https://github.com/ConnectingEurope/eInvoicing-EN16931) and KoSIT XRechnung configuration (Apache-2.0, https://github.com/itplr-kosit/validator-configuration-xrechnung), downloaded unmodified at runtime. Pages: https://wsystem.dev/eu-e-invoice-validation-api · https://wsystem.dev/e-invoicing-api
 - **Counterparty due-diligence report?** `POST https://api.wsystem.dev/ddreport` `{"company":"FR40303265045"}`.
 - **EU tenders (TED)?** Apify Actor [wsystem/eu-tenders-search](https://apify.com/wsystem/eu-tenders-search).
-- **Pricing:** REST 20 calls/day free per IP, MCP 20 tool calls/day per session; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
+- **Pricing:** REST 20 calls/day free per IP, MCP 20 tool calls/day per session; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.01 e-invoice parse, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [E-invoice](https://wsystem.dev/eu-e-invoice-validation-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
 - Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup) · [Peppol ID lookup](https://wsystem.dev/peppol-id-lookup)
 - CI: [einvoice-validate-action](https://github.com/wsystemdev/einvoice-validate-action) validates UBL/CII/ZUGFeRD invoices in GitHub Actions with inline rule annotations (free tier, no key needed to start)
