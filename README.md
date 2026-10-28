@@ -52,6 +52,7 @@ Example client config:
 - **Pricing:** REST 20 calls/day free per IP, MCP 20 tool calls/day per session; x402 $0.01 per single check, $0.10 per batch, $0.045 per KYB, $0.03 e-invoice validate, $0.01 e-invoice parse, $0.08 e-invoice create / sandbox send, $0.02 e-invoice route, $0.49 due-diligence report; Apify pay-per-event.
 - Product pages: [VAT API](https://wsystem.dev/eu-vat-number-validation-api) · [VIES down](https://wsystem.dev/vies-down-fallback) · [EORI](https://wsystem.dev/eori-number-check-api) · [Sanctions](https://wsystem.dev/eu-sanctions-screening-api) · [Company registry](https://wsystem.dev/eu-company-registry-api) · [TED tenders](https://wsystem.dev/ted-tenders-api) · [KYB](https://wsystem.dev/kyb-api) · [E-invoice](https://wsystem.dev/eu-e-invoice-validation-api) · [EU VAT validation guide](https://wsystem.dev/eu-vat-validation-guide)
 - Free tools: [Bulk VAT checker (CSV)](https://wsystem.dev/bulk-vat-checker) · [VIES status](https://wsystem.dev/vies-status) · [EORI lookup](https://wsystem.dev/eori-lookup) · [Peppol ID lookup](https://wsystem.dev/peppol-id-lookup)
+- Client libraries: [PHP / Laravel `wsystem/wsystem-php`](https://packagist.org/packages/wsystem/wsystem-php) (Composer, with an `eu_vat` validation rule) · [JavaScript `wsystem`](https://www.npmjs.com/package/wsystem) (npm) · [n8n node `n8n-nodes-wsystem`](https://www.npmjs.com/package/n8n-nodes-wsystem) · [Postman collection](https://github.com/wsystemdev/wsystem-postman)
 - CI: [einvoice-validate-action](https://github.com/wsystemdev/einvoice-validate-action) validates UBL/CII/ZUGFeRD invoices in GitHub Actions with inline rule annotations (free tier, no key needed to start)
 - OpenAPI: https://api.wsystem.dev/openapi.json · x402 manifest: https://api.wsystem.dev/.well-known/x402
 
@@ -61,7 +62,7 @@ Example client config:
 - Fallback results have `fallback: true`, `fallback_type` (`national_source` | `last_vies_result`), `source`, `legal_status`, `vies_error`, and **no consultation number**. National registers show domestic status, which is not VIES audit proof. Turn off with `fallback=false`.
 - No free automated source for DE (BZSt eVatR requires a German requester VAT ID), ES (certificate), IT (captcha), NL, BE, HU (NAV technical user), DK.
 - `GET /vies/status`: EC VIES per-country availability, cached 5 min, free.
-- **GB**: accepted and HMRC check-digit validated. Live check via HMRC *Check a UK VAT number* API v2 is implemented (`vatcheck/hmrc.py`) but needs OAuth app credentials from the HMRC Developer Hub (`HMRC_CLIENT_ID`, `HMRC_CLIENT_SECRET`, optional `HMRC_REQUESTER_VRN`); without them GB results return `status: not_configured`. **XI** is checked in VIES.
+- **GB**: accepted and HMRC check-digit validated, but the live HMRC lookup is not switched on yet (HMRC production access pending). GB numbers return `status: member_state_unavailable`, `valid: null`, `error: HMRC_LIVE_ACCESS_PENDING`: not a validity result, not cached and not billed. **XI** (Northern Ireland) is checked in VIES.
 
 ## Integration guides
 Step-by-step guides (every snippet tested against the live API): [docs/](docs/README.md)
