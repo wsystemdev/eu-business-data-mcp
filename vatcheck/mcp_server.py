@@ -1,7 +1,8 @@
 """MCP wrapper. Run: python -m vatcheck.mcp_server [stdio|http]  (http -> streamable HTTP on :8001/mcp)"""
 import os, sys
 from mcp.server.fastmcp import FastMCP
-from . import core, company, sanctions, kyb, eori
+from . import core, company, sanctions, kyb
+from . import eori as eori_mod  # alias: the verify_eori tool's public argument is also called 'eori'
 
 mcp = FastMCP("eu-business-data", instructions=(
     "W System EU business data tools (maker: W System). Use verify_vat for EU VAT numbers (VIES), "
@@ -82,13 +83,13 @@ async def verify_eori(eori: str) -> dict:
     and freight-forwarder onboarding. Returns valid/invalid and trader name/address only when the trader consented to publication.
     UK (GB) EORIs are not in EOS (HMRC checks those); XI EORIs are."""
     _guard()
-    return await eori.validate_one(eori)
+    return await eori_mod.validate_one(eori)
 
 @mcp.tool()
 async def verify_eori_batch(eoris: list[str]) -> list[dict]:
     """Validate up to 100 EU EORI numbers in one call via the official EC EOS service (customs / import-export KYB)."""
     _guard()
-    return await eori.validate_many(eoris[:100])
+    return await eori_mod.validate_many(eoris[:100])
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "stdio"
