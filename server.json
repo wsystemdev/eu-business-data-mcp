@@ -3,8 +3,17 @@
   "name": "io.github.wsystemdev/eu-business-data-mcp",
   "title": "EU e-invoicing and business checks (EN 16931, Peppol, VAT, sanctions)",
   "description": "EN 16931/XRechnung e-invoice validate+create, Peppol routing, EU VAT/EORI, sanctions, KYB. Free tier",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "websiteUrl": "https://wsystem.dev",
+  "icons": [
+    {
+      "src": "https://wsystem.dev/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
   "repository": {
     "url": "https://github.com/wsystemdev/eu-business-data-mcp",
     "source": "github"
