@@ -127,16 +127,26 @@ async def _vies_call(client: httpx.AsyncClient, cc: str, num: str, req: str | No
                 except Exception:
                     pass
             else:
-                j = r.json()
-                errs = [e.get("error") for e in j.get("errorWrappers", [])] if "errorWrappers" in j else []
-                err = j.get("userError") if j.get("userError") not in (None, "VALID", "INVALID") else (errs[0] if errs else None)
-                if err and err in TRANSIENT:
-                    last_err = err
-                elif err:
-                    return {"_error": err, "_attempts": attempt + 1}
-                else:
-                    j["_attempts"] = attempt + 1
-                    return j
+                try:
+                    j = r.json()
+                    if not isinstance(j, dict):
+                        raise ValueError("not an object")
+                except ValueError:
+                    # 2026-11-10: VIES answered 200 with a body that is not one JSON object ("Extra data: line 1 column 5").
+                    # The JSONDecodeError escaped as a ValueError, so einvoice_route returned bad_input for a valid VAT.
+                    # Treat it as a transient upstream fault: retry, then member_state_unavailable.
+                    last_err = "VIES_BAD_RESPONSE"
+                    j = None
+                if j is not None:
+                    errs = [e.get("error") for e in j.get("errorWrappers", [])] if "errorWrappers" in j else []
+                    err = j.get("userError") if j.get("userError") not in (None, "VALID", "INVALID") else (errs[0] if errs else None)
+                    if err and err in TRANSIENT:
+                        last_err = err
+                    elif err:
+                        return {"_error": err, "_attempts": attempt + 1}
+                    else:
+                        j["_attempts"] = attempt + 1
+                        return j
         except (httpx.TimeoutException, httpx.TransportError) as e:
             last_err = f"NETWORK:{type(e).__name__}"
         if attempt < MAX_RETRIES:

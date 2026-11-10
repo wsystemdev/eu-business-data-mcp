@@ -91,9 +91,6 @@ async def verify_eori_batch(eoris: list[str]) -> list[dict]:
     _guard()
     return await eori_mod.validate_many(eoris[:100])
 
-if __name__ == "__main__":
-    mode = sys.argv[1] if len(sys.argv) > 1 else "stdio"
-    mcp.run(transport="streamable-http" if mode == "http" else "stdio")
 
 
 @mcp.tool()
@@ -147,3 +144,85 @@ async def due_diligence_report(company: str, country: str = "") -> dict:
     _guard()
     from . import ddreport
     return await ddreport.report(company, country)
+
+
+# --- Tool titles, MCP annotations and per-argument descriptions (B195b/B198, 2026-11-10) -------------------------------
+# Directories (mcptry, Glama, PulseMCP) and clients (Claude connectors) read these: readOnlyHint lets clients run lookups
+# without a write-confirmation, and argument descriptions help agents fill inputs. Applied after registration so the tool
+# functions above stay unchanged. test_mcp_metadata.py fails if a tool or an argument is missing here.
+from mcp.types import ToolAnnotations as _TA
+
+_TOOL_META = {
+    # name: (title, read_only, idempotent, open_world, {arg: description})
+    "verify_vat": ("Verify EU VAT number (VIES)", True, True, True, {
+        "vat": "VAT number with country prefix, e.g. 'IE6388047V' or 'DE811193231'; spaces and dots are ignored.",
+        "requester": "Optional: your own EU VAT number, so VIES returns a consultation number as audit proof."}),
+    "verify_batch": ("Verify up to 100 EU VAT numbers", True, True, True, {
+        "vats": "List of up to 100 VAT numbers with country prefix; extra items are ignored.",
+        "requester": "Optional: your own EU VAT number, so VIES returns consultation numbers as audit proof."}),
+    "lookup_company": ("Look up a company in EU business registers", True, True, True, {
+        "query": "Company name or official registry number (e.g. a French SIREN, Polish KRS or Czech ICO).",
+        "country": "Register to search: FR, NO, FI, CZ, PL (KRS), EE, another ISO country code, or 'LEI' for GLEIF.",
+        "limit": "Maximum number of matches to return (default 3)."}),
+    "screen_sanctions": ("Screen a name against EU/UN/OFAC/UK sanctions", True, True, False, {
+        "name": "Person or company name to screen.",
+        "threshold": "Minimum fuzzy match score from 0 to 100 (default 85); lower finds more possible matches.",
+        "birth_year": "Optional birth year of a person, to narrow matches.",
+        "country": "Optional ISO two-letter country code, to narrow matches."}),
+    "kyb_check": ("KYB check: VAT, register and sanctions", True, True, True, {
+        "company": "Company VAT number (best) or company name.",
+        "country": "Optional ISO two-letter country code when a name is given.",
+        "requester": "Optional: your own EU VAT number, so VIES returns a consultation number as audit proof."}),
+    "verify_eori": ("Verify EU EORI number (EC EOS)", True, True, True, {
+        "eori": "EORI number with country prefix, e.g. 'SE5560360793'."}),
+    "verify_eori_batch": ("Verify up to 100 EU EORI numbers", True, True, True, {
+        "eoris": "List of up to 100 EORI numbers with country prefix."}),
+    "validate_einvoice": ("Validate an e-invoice (EN 16931, XRechnung, Peppol BIS)", True, True, False, {
+        "xml": "The e-invoice XML as text: UBL 2.1 Invoice/CreditNote or UN/CEFACT CII (XRechnung, Factur-X/ZUGFeRD XML).",
+        "rules": "Rule set: 'auto' (detect from the invoice, default), 'en16931' or 'xrechnung'.",
+        "autofix": "If true, apply the safe fixes to a copy and return the fixed XML in autofix.xml (the input is never changed).",
+        "allow_amount_changes": "If true together with autofix, also apply fixes that change amounts (e.g. recomputed totals)."}),
+    "parse_einvoice": ("Read a received e-invoice into JSON", True, True, False, {
+        "xml": "Invoice XML as text (UBL or CII). Give either xml or pdf_base64.",
+        "pdf_base64": "Base64 of a Factur-X/ZUGFeRD PDF with embedded XML. Give either xml or pdf_base64."}),
+    "create_einvoice": ("Create a validated e-invoice (UBL 2.1)", True, True, False, {
+        "invoice": "Invoice as simple JSON: format, invoice_number, issue_date, currency, seller, buyer, lines, payment (see the tool description).",
+        "autofix": "If true, first apply safe input fixes (date formats, codes, VAT ID format, misnamed fields); the corrected input is in autofix.invoice."}),
+    "einvoice_route": ("Can this company receive e-invoices? (Peppol + mandate)", True, True, True, {
+        "id": "Buyer's EU VAT number (e.g. 'BE0403170701') or Peppol participant id (e.g. '0208:0403170701')."}),
+    "send_einvoice_sandbox": ("Preflight and sandbox-send an e-invoice", False, False, True, {
+        "invoice": "Invoice as simple JSON (same shape as create_einvoice).",
+        "transport": "Sandbox transport: 'mock' (simulated, default), 'recommand' or 'e-invoice-be' (partner sandbox); never reaches a real buyer.",
+        "preflight_only": "If true, only check the buyer (VAT, Peppol, sanctions) and the invoice; nothing is sent.",
+        "checks": "Optional subset of buyer checks: any of 'vat', 'peppol', 'sanctions' (default all; invoice validation always runs).",
+        "autofix": "Only with preflight_only=true: run the checks on a copy with safe fixes applied and return it in autofix.invoice."}),
+    "due_diligence_report": ("Counterparty due-diligence report", True, True, True, {
+        "company": "Company VAT number (best) or company name.",
+        "country": "Optional ISO two-letter country code when a name is given."}),
+    "check_fr_pa_registry": ("Is it a French approved e-invoicing platform (PA)?", True, True, False, {
+        "name": "Platform or company name to look up (give name, website or both).",
+        "website": "Platform website or domain, e.g. 'example.fr'.",
+        "limit": "Maximum number of matches to return (1-20, default 5)."}),
+}
+
+
+def _apply_tool_meta() -> None:
+    for t in mcp._tool_manager.list_tools():
+        meta = _TOOL_META.get(t.name)
+        if not meta:
+            continue
+        title, ro, idem, ow, args = meta
+        t.title = title
+        t.annotations = _TA(title=title, readOnlyHint=ro, destructiveHint=False, idempotentHint=idem, openWorldHint=ow)
+        for arg, desc in args.items():
+            prop = t.parameters.get("properties", {}).get(arg)
+            if prop is not None and "description" not in prop:
+                prop["description"] = desc
+
+
+_apply_tool_meta()
+
+# Must stay last: mcp.run() blocks, so tools defined below it were missing in stdio/http mode.
+if __name__ == "__main__":
+    mode = sys.argv[1] if len(sys.argv) > 1 else "stdio"
+    mcp.run(transport="streamable-http" if mode == "http" else "stdio")
