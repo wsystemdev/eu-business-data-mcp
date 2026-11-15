@@ -80,7 +80,7 @@ REST API docs and a free API key (no card): https://api.wsystem.dev/docs?ref=mcp
 
 ## Pricing
 - **MCP endpoint:** free, 20 tool calls per day per MCP session (details and the shared limit for Claude connector traffic above). With an API key in `X-API-Key`: Starter EUR 19/month (5,000 units) or Pro EUR 49/month (25,000 units). When a free limit is reached, the tool returns an error that names the limit and explains how to add a key.
-- **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, `GET /company?q=...`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.045 per KYB check. Unpaid calls get HTTP 402 with the payment requirements.
+- **REST API with x402** on the same host (`https://api.wsystem.dev`, e.g. `GET /verify?vat=...`, `POST /verify/batch`, sanctions, KYB and EORI routes): after the free allowance, calls are paid per request with **[x402](https://x402.org)** in **USDC on Base**: about $0.01 per single check, $0.10 per batch, $0.045 per KYB check. Basic company search (`GET /company?q=...`, MCP tool `lookup_company`) is free: no payment, no API key and 0 units, rate-limited (300/minute and 5,000/day per API key, 120/minute and 500/day per IP without a key; HTTP 429 with Retry-After). Unpaid calls get HTTP 402 with the payment requirements.
 - **Apify Actors** (pay per event), see below.
 
 ## Also on Apify
