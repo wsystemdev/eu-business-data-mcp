@@ -23,7 +23,7 @@ Example client config:
 { "mcpServers": { "eu-business-data": { "type": "http", "url": "https://api.wsystem.dev/mcp/" } } }
 ```
 
-### Tools (14)
+### Tools (15)
 | Tool | What it does |
 |---|---|
 | `verify_vat` | Validate an EU VAT number live against VIES (27 EU states + XI), with name/address and optional consultation number |
@@ -35,7 +35,8 @@ Example client config:
 | `verify_eori_batch` | Validate several EORI numbers at once |
 | `validate_einvoice` | Validate a UBL or CII e-invoice against the official EN 16931 and XRechnung rules: errors with rule IDs, plain-English messages and fix hints |
 | `parse_einvoice` | Read an incoming e-invoice (UBL Invoice/CreditNote, CII, or the XML inside a ZUGFeRD / Factur-X PDF as base64) into one JSON shape: seller, buyer, dates, references, totals, VAT breakdown, payment/IBAN, lines, attachments. Values as written, no validation (use `validate_einvoice`). Guide: [read XRechnung / ZUGFeRD as JSON](https://wsystem.dev/read-xrechnung-zugferd-json-api?ref=mcp-github) |
-| `create_einvoice` | Turn simple JSON into a validated UBL 2.1 invoice (EN 16931, XRechnung or Peppol BIS 3 structure) |
+| `check_invoice` | Hosted server only: check a received invoice before paying it (EN 16931 / XRechnung rules, supplier VAT in VIES, sanctions, amounts, IBAN, duplicates and bank-detail changes against your history with an API key) -> ok / review / hold |
+| `create_einvoice` | Turn simple JSON into a validated EU e-invoice: UBL 2.1 (EN 16931, XRechnung, Peppol BIS 3), UN/CEFACT CII (incl. XRechnung CII) or a ZUGFeRD 2.3 / Factur-X EN 16931 PDF/A-3 hybrid (returns the PDF as base64 plus the embedded CII). Credit notes (type 381 with the preceding invoice) and document/line allowances and charges; totals and VAT breakdown are computed. Guide: [XRechnung / ZUGFeRD API for invoicing software](https://wsystem.dev/e-invoice-api-for-invoicing-software?ref=mcp-github) |
 | `einvoice_route` | "Can I e-invoice this company?": VIES + Peppol Directory + country B2B mandate + recommended format |
 | `send_einvoice_sandbox` | SANDBOX: verify buyer VAT + sanctions → create/validate EN 16931 → route → mock transport (nothing transmitted) → Ed25519-signed evidence receipt |
 | `due_diligence_report` | VAT, register, sanctions, EORI, GLEIF LEI and Peppol in one report with risk flags and a timestamp |
