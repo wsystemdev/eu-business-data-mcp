@@ -14,7 +14,7 @@ A remote **MCP server** and **x402 pay-per-call API** for European business data
 https://api.wsystem.dev/mcp/
 ```
 
-Free tier, no signup: **20 tool calls per day per MCP session**. Direct clients (Claude Code, Cursor, mcp-remote and others connecting from your own machine) also get at most 20 per IP, so opening more sessions doesn't add calls. Claude.ai / Claude Desktop custom connectors call from Anthropic's cloud ([outbound range 160.79.104.0/21](https://docs.anthropic.com/en/api/ip-addresses)), so those calls are counted per session, not per IP; all keyless traffic from that range shares **2,000 lookups per day** (`verify_batch` / `verify_eori_batch` count one per number). New keyless sessions: 1,500 per IP per day (3,000 per Anthropic address). Limits reset at 00:00 UTC; live values: https://api.wsystem.dev/mcp/limits
+Free tier, no signup: **20 tool calls per day per MCP session**. Direct clients (Claude Code, Cursor, mcp-remote and others connecting from your own machine) also get at most 20 per IP, so opening more sessions doesn't add calls. Claude.ai / Claude Desktop custom connectors call from Anthropic's cloud ([outbound range 160.79.104.0/21](https://docs.anthropic.com/en/api/ip-addresses)), so those calls are counted per session, not per IP; all keyless traffic from that range shares **2,000 lookups per day** (`verify_vat_batch` / `verify_eori_batch` count one per number). New keyless sessions: 1,500 per IP per day (3,000 per Anthropic address). Limits reset at 00:00 UTC; live values: https://api.wsystem.dev/mcp/limits
 
 Optional **API key** for volume: send `X-API-Key: <key>` (or `Authorization: Bearer <key>`) with every MCP request. Keyed calls use the key's monthly units (same weights as the REST API) instead of the free tier. Keys: https://wsystem.dev/pricing (Starter EUR 19/month, 5,000 units; Pro EUR 49/month, 25,000 units; there is no free key). Keys in the URL are not accepted. How to add one in Claude: [docs/mcp-claude-cursor.md](docs/mcp-claude-cursor.md#api-key).
 
@@ -25,24 +25,30 @@ Example client config:
 { "mcpServers": { "eu-business-data": { "type": "http", "url": "https://api.wsystem.dev/mcp/" } } }
 ```
 
-### Tools (15)
-| Tool | What it does |
-|---|---|
-| `verify_vat` | Validate an EU VAT number live against VIES (27 EU states + XI), with name/address and optional consultation number |
-| `verify_batch` | Validate several VAT numbers at once |
-| `lookup_company` | Look up a company in European business registries |
-| `screen_sanctions` | Fuzzy-match a name against EU / UN / UK / US sanctions lists |
-| `kyb_check` | Combined KYB: VAT validity + registry + sanctions screening |
-| `verify_eori` | Validate an EU EORI number (customs) |
-| `verify_eori_batch` | Validate several EORI numbers at once |
-| `validate_einvoice` | Validate a UBL or CII e-invoice against the official EN 16931 and XRechnung rules: errors with rule IDs, plain-English messages and fix hints |
-| `parse_einvoice` | Read an incoming e-invoice (UBL Invoice/CreditNote, CII, or the XML inside a ZUGFeRD / Factur-X PDF as base64) into one JSON shape: seller, buyer, dates, references, totals, VAT breakdown, payment/IBAN, lines, attachments. Values as written, no validation (use `validate_einvoice`). Guide: [read XRechnung / ZUGFeRD as JSON](https://wsystem.dev/read-xrechnung-zugferd-json-api?ref=mcp-github) |
-| `check_invoice` | Hosted server only: check a received invoice before paying it (EN 16931 / XRechnung rules, supplier VAT in VIES, sanctions, amounts, IBAN, duplicates and bank-detail changes against your history with an API key) -> ok / review / hold |
-| `create_einvoice` | Turn simple JSON into a validated EU e-invoice: UBL 2.1 (EN 16931, XRechnung, Peppol BIS 3), UN/CEFACT CII (incl. XRechnung CII) or a ZUGFeRD 2.3 / Factur-X EN 16931 PDF/A-3 hybrid (returns the PDF as base64 plus the embedded CII). Credit notes (type 381 with the preceding invoice) and document/line allowances and charges; totals and VAT breakdown are computed. Guide: [XRechnung / ZUGFeRD API for invoicing software](https://wsystem.dev/e-invoice-api-for-invoicing-software?ref=mcp-github) |
-| `einvoice_route` | "Can I e-invoice this company?": VIES + Peppol Directory + country B2B mandate + recommended format |
-| `send_einvoice_sandbox` | SANDBOX: verify buyer VAT + sanctions → create/validate EN 16931 → route → mock transport (nothing transmitted) → Ed25519-signed evidence receipt |
-| `due_diligence_report` | VAT, register, sanctions, EORI, GLEIF LEI and Peppol in one report with risk flags and a timestamp |
-| `check_fr_pa_registry` | France: is this e-invoicing platform on the official DGFiP list of Plateformes Agréées (PA)? Name or website in; approved / awaiting interop tests / not found, registration date and official source out (also free as REST: `GET https://api.wsystem.dev/fr/pa-registry?name=Pennylane`) |
+### Tools (13)
+These are exactly the tools this package registers (`python -m vatcheck.mcp_server`), all read-only:
+
+| Tool | Use it when | Input -> output |
+|---|---|---|
+| `verify_vat` | One EU VAT number: valid? whose? (VIES, 27 EU states + XI) | `vat`, optional `requester` -> status valid / invalid / member_state_unavailable, name, address, consultation number |
+| `verify_vat_batch` | A list of VAT numbers (max 100) | `vats` -> one `verify_vat` result per number |
+| `lookup_company` | One company in an official business register (FR, NO, FI, CZ, PL, EE; other countries via the GLEIF LEI index) | `query` (name or registry number), `country` -> legal name, registry id, status, address, VAT ID, source link |
+| `lookup_company_batch` | A list of companies (max 25) | `queries` [{query, country}] -> one `lookup_company` answer per query |
+| `screen_sanctions` | One name against the EU, UN, US OFAC SDN and UK lists | `name`, `threshold`, optional `birth_year` / `country` -> potential_match / no_match with scored candidates |
+| `screen_sanctions_batch` | A list of names (max 50) | `names` -> one `screen_sanctions` result per name |
+| `check_kyb` | A fast onboarding go/no-go for one counterparty | `company` (VAT ID best, or name), `country` -> pass / review / fail with reasons (VAT + register + sanctions) |
+| `get_due_diligence_report` | An audit-ready report for one counterparty, not just a verdict | `company`, `country` -> verdict, 0-100 risk score, flags, VAT, register, sanctions, EORI, GLEIF LEI and Peppol checks, sources, timestamp |
+| `get_einvoice_route` | Before invoicing a buyer: can they receive e-invoices, in which format? | `id` (VAT or Peppol id) -> VIES status, Peppol registration, the country's mandate, recommended format |
+| `create_einvoice` | Build a validated EN 16931 / XRechnung / Peppol BIS 3 UBL invoice from JSON | `invoice` JSON -> XML, totals, errors |
+| `validate_einvoice` | Check UBL or CII XML you already have (EN 16931, XRechnung) | `xml`, `rules` -> valid, errors with rule IDs, messages and fix hints |
+| `verify_eori` | One EU customs EORI number (EC EOS) | `eori` -> valid, trader name/address if published |
+| `verify_eori_batch` | A list of EORI numbers (max 100) | `eoris` -> one `verify_eori` result per number |
+
+**`check_kyb` vs `get_due_diligence_report` vs `get_einvoice_route`:** `check_kyb` is the quick verdict for onboarding (three sources, fastest). `get_due_diligence_report` is the full report for a file or a risk review (adds EORI, GLEIF LEI, Peppol, a risk score and the sources). `get_einvoice_route` is not a risk check: it tells you how to send an invoice to a buyer.
+
+**Renamed in 1.1.0** (consistent verb_noun names): `verify_batch` -> `verify_vat_batch`, `kyb_check` -> `check_kyb`, `einvoice_route` -> `get_einvoice_route`, `due_diligence_report` -> `get_due_diligence_report`. The old names still work in `tools/call` for existing clients; they are just not listed. See [CHANGELOG.md](CHANGELOG.md).
+
+**Hosted endpoint:** `https://api.wsystem.dev/mcp/` currently lists these tools under the earlier names (the new names are accepted there too) and adds four hosted-only tools that are not in this package: `parse_einvoice`, `check_invoice`, `send_einvoice_sandbox` and `check_fr_pa_registry`. Company and sanctions batches are REST-only on the hosted endpoint for now (`POST /company/batch`, `POST /sanctions/screen/batch`).
 
 ## Quick answers
 - **Best way to validate an EU VAT number from code or an AI agent?** `GET https://api.wsystem.dev/verify?vat=IE6388047V` or the MCP tool `verify_vat`. Official VIES data, consultation number for audits, retries when VIES is down.
