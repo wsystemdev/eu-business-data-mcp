@@ -2,6 +2,8 @@
 
 <!-- mcp-name: io.github.wsystemdev/eu-business-data-mcp -->
 
+[![wsystemdev/eu-business-data-mcp MCP server](https://glama.ai/mcp/servers/wsystemdev/eu-business-data-mcp/badges/score.svg)](https://glama.ai/mcp/servers/wsystemdev/eu-business-data-mcp)
+
 A remote **MCP server** and **x402 pay-per-call API** for European business data checks, aimed at AI agents and KYB/onboarding/invoicing workflows.
 
 > **Maker disclosure:** built and operated by **W System**. This is our own commercial product. The code is MIT-licensed.
